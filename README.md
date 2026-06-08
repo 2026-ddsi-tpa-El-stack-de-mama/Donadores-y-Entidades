@@ -12,6 +12,9 @@
 
 ---
 
+🧩 Componente Desarrollado
+- https://app.swaggerhub.com/apis/utn-f4b/2026-ddsi-tpa-donadores-y-entidades/1.0.0
+
 🧩 Link al despliegue en Render
 - https://entrega-2-abelvergara88.onrender.com
 
