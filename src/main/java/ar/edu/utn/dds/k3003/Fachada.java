@@ -33,7 +33,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
   private FachadaIncentivos fachadaIncentivos;
 
-  public Fachada() {
+  public Fachada(DonadoresRepository donadoresRepository) {
     /*
     Para que se ejecuten correctamente los tests, se necesita tener un constructor vacio
     Es decir, que no reciba parametros.
@@ -41,7 +41,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     Java permite tener varios constructores conviviendo sin conflictos.
     */
 
-    this.donadoresRepository = new InMemoryDonadoresRepo();
+    this.donadoresRepository = donadoresRepository;
     //agregado
     this.entidadesRepository = new InMemoryEntidadesRepo();
     this.necesidadesRepository = new InMemoryNecesidadesRepo();
@@ -55,10 +55,10 @@ public class Fachada implements FachadaDonadoresYEntidades {
     if (donadorDTO == null) {
       throw new RuntimeException();
     }
-
-    if (this.donadoresRepository.findById(donadorDTO.id()).isPresent()) {
+/*
+    if (donadorDTO.id() != null && this.donadoresRepository.findById(donadorDTO.id()).isPresent()) {
       throw new RuntimeException();
-    }
+    } */
 
     Donador donador = donadoresYEntidadesDataMapper.toDonador(donadorDTO);
 

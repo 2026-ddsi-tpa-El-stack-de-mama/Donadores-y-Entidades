@@ -1,30 +1,45 @@
 package ar.edu.utn.dds.k3003.model;
 
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EstadoDonadorEnum;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "donadores")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Donador {
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
+
   private String nombre;
   private String apellido;
   private Integer edad;
   private String email;
   private String nroDocumento;
   private String domicilio;
+
+  @Enumerated(EnumType.STRING)
   private EstadoDonadorEnum estado;
+
   private String categoria;
 
+  /*@OneToMany(
+          cascade = CascadeType.ALL,
+          orphanRemoval = true
+  )*/
+  @Transient
   private List<Queja> quejas = new ArrayList<>();
 
-  public Donador() {
-  }
+  //public Donador() {}
 
   public Donador(
           String nombre,
@@ -47,78 +62,4 @@ public class Donador {
     this.quejas.add(queja);
   }
 }
-/*
-  public String getId() {
-    return id;
-  }
 
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getNombre() {
-    return nombre;
-  }
-
-  public void setNombre(String nombre) {
-    this.nombre = nombre;
-  }
-
-  public String getApellido() {
-    return apellido;
-  }
-
-  public void setApellido(String apellido) {
-    this.apellido = apellido;
-  }
-
-  public Integer getEdad() {
-    return edad;
-  }
-
-  public void setEdad(Integer edad) {
-    this.edad = edad;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public String getNroDocumento() {
-    return nroDocumento;
-  }
-
-  public void setNroDocumento(String nroDocumento) {
-    this.nroDocumento = nroDocumento;
-  }
-
-  public String getDomicilio() {
-    return domicilio;
-  }
-
-  public void setDomicilio(String domicilio) {
-    this.domicilio = domicilio;
-  }
-
-  public EstadoDonadorEnum getEstado() {
-    return estado;
-  }
-
-  public void setEstado(EstadoDonadorEnum estado) {
-    this.estado = estado;
-  }
-
-  public String getCategoria() {
-    return categoria;
-  }
-
-  public void setCategoria(String categoria) {
-    this.categoria = categoria;
-  }
-}
-
- */
