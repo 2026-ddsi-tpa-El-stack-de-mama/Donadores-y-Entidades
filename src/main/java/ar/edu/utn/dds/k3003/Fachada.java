@@ -33,7 +33,8 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
   private FachadaIncentivos fachadaIncentivos;
 
-  public Fachada(DonadoresRepository donadoresRepository) {
+  public Fachada(DonadoresRepository donadoresRepository,
+                 EntidadesRepository entidadesRepository) {
     /*
     Para que se ejecuten correctamente los tests, se necesita tener un constructor vacio
     Es decir, que no reciba parametros.
@@ -43,7 +44,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     this.donadoresRepository = donadoresRepository;
     //agregado
-    this.entidadesRepository = new InMemoryEntidadesRepo();
+    this.entidadesRepository = entidadesRepository;
     this.necesidadesRepository = new InMemoryNecesidadesRepo();
   }
 
@@ -248,13 +249,13 @@ public class Fachada implements FachadaDonadoresYEntidades {
     EntidadBenefica entidad =
             donadoresYEntidadesDataMapper.toEntidad(entidadBeneficaDTO);
 
-    if (entidad.getId() == null) {
+    /* if (entidad.getId() == null) {
       entidad.setId(java.util.UUID.randomUUID().toString());
-    }
+    } */
 
-    entidadesRepository.save(entidad);
+    EntidadBenefica entidadGuardada = entidadesRepository.save(entidad);
 
-    return donadoresYEntidadesDataMapper.toEntidadDTO(entidad);
+    return donadoresYEntidadesDataMapper.toEntidadDTO(entidadGuardada);
   }
 
   //IMPLEMENTADO

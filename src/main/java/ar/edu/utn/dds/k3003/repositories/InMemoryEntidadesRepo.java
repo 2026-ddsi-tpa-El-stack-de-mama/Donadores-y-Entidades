@@ -1,4 +1,4 @@
-package ar.edu.utn.dds.k3003.repositories;
+/* package ar.edu.utn.dds.k3003.repositories;
 
 import ar.edu.utn.dds.k3003.model.EntidadBenefica;
 
@@ -28,4 +28,4 @@ public class InMemoryEntidadesRepo implements EntidadesRepository {
                 .stream()
                 .toList();
     }
-}
+} */
