@@ -34,7 +34,8 @@ public class Fachada implements FachadaDonadoresYEntidades {
   private FachadaIncentivos fachadaIncentivos;
 
   public Fachada(DonadoresRepository donadoresRepository,
-                 EntidadesRepository entidadesRepository) {
+                 EntidadesRepository entidadesRepository,
+                 NecesidadesRepository necesidadesRepository) {
     /*
     Para que se ejecuten correctamente los tests, se necesita tener un constructor vacio
     Es decir, que no reciba parametros.
@@ -43,9 +44,8 @@ public class Fachada implements FachadaDonadoresYEntidades {
     */
 
     this.donadoresRepository = donadoresRepository;
-    //agregado
     this.entidadesRepository = entidadesRepository;
-    this.necesidadesRepository = new InMemoryNecesidadesRepo();
+    this.necesidadesRepository = necesidadesRepository;
   }
 
 
@@ -180,24 +180,24 @@ public class Fachada implements FachadaDonadoresYEntidades {
     if (cantidad == null || cantidad <= 0) {
       throw new RuntimeException(/*"Cantidad inválida"*/);
     }
-
     NecesidadMaterial necesidad = necesidadesRepository
             .findById(necesidadID)
             .orElse(null);
-
     if (necesidad == null) {
       throw new RuntimeException(/*"Necesidad no encontrada"*/);
     }
-
     int nuevaCantidad = necesidad.getCantidadActual() + cantidad;
-
     //Nuevo requerimiento TP2
     if (necesidad.getTipo() == RECURRENTE &&
             cantidad < necesidad.getCantidadObjetivo()) {
       throw new RuntimeException();
     }
-
+    if (necesidad.getCantidadActual() >= necesidad.getCantidadObjetivo()) {
+      throw new RuntimeException("Necesidad ya satisfecha");
+    }
     necesidad.setCantidadActual(nuevaCantidad);
+
+    necesidadesRepository.save(necesidad);
 
     return donadoresYEntidadesDataMapper.toNecesidadDTO(necesidad);
   }
@@ -284,13 +284,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
     NecesidadMaterial necesidad =
             donadoresYEntidadesDataMapper.toNecesidad(necesidadMaterialDTO);
 
-    if (necesidad.getId() == null) {
+  /*  if (necesidad.getId() == null) {
       necesidad.setId(java.util.UUID.randomUUID().toString());
-    }
+    } */
 
-    necesidadesRepository.save(necesidad);
+    NecesidadMaterial necesidadGuardada =
+            necesidadesRepository.save(necesidad);
 
-    return donadoresYEntidadesDataMapper.toNecesidadDTO(necesidad);
+    return donadoresYEntidadesDataMapper.toNecesidadDTO(necesidadGuardada);
   }
 
   //IMPLEMENTADO
@@ -321,6 +322,18 @@ public class Fachada implements FachadaDonadoresYEntidades {
     }
 
     return donadoresYEntidadesDataMapper.toQuejaDTO(queja);
+  }
+
+  //Nuevo necesidades insatisfechas por productoID
+  public List<NecesidadMaterialDTO> obtenerNecesidadesInsatisfechas(
+          String productoId
+  ) {
+
+    return necesidadesRepository.findAll().stream()
+            .filter(n -> n.getProductoSolicitadoID().equals(productoId))
+            .filter(n -> n.getCantidadActual() < n.getCantidadObjetivo())
+            .map(donadoresYEntidadesDataMapper::toNecesidadDTO)
+            .toList();
   }
 
   //IMPLEMENTADO

@@ -36,6 +36,15 @@ public class NecesidadController {
         );
     }
 
+    @GetMapping("/insatisfechas")
+    public ResponseEntity<List<NecesidadMaterialDTO>> obtenerNecesidadesInsatisfechas(
+            @RequestParam String productoId
+    ) {
+        return ResponseEntity.ok(
+                fachada.obtenerNecesidadesInsatisfechas(productoId)
+        );
+    }
+
     @PostMapping("/{necesidadID}/satisfaccion")
     public ResponseEntity<NecesidadMaterialDTO> satisfacerNecesidad(
             @PathVariable String necesidadID,

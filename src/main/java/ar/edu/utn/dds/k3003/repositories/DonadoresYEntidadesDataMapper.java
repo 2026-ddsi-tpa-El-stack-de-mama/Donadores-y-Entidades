@@ -77,6 +77,7 @@ public class DonadoresYEntidadesDataMapper {
             necesidad.getNivelDeUrgencia(),
             necesidad.getDescripcion(),
             necesidad.getCantidadObjetivo(),
+            necesidad.getCantidadActual(),
             necesidad.getProductoSolicitadoID(),
             necesidad.getTipo()
     );
