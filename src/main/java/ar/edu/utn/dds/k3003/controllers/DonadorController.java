@@ -91,7 +91,7 @@ public class DonadorController {
             fachada.estadisticasDonador(id)
     );
   }
-
+/*
   @PostMapping("/{id}/quejas")
   public ResponseEntity<QuejaDTO> agregarQueja(
           @PathVariable String id,
@@ -101,6 +101,14 @@ public class DonadorController {
     return ResponseEntity.ok(
             fachada.agregarQueja(quejaDTO)
     );
+  } */
+
+  @PostMapping("/{id}/quejas")
+  public QuejaDTO agregarQueja(
+          @PathVariable String id,
+          @RequestBody QuejaDTO quejaDTO) {
+
+    return fachada.agregarQueja(id, quejaDTO);
   }
 
   @GetMapping("/{id}/quejas")

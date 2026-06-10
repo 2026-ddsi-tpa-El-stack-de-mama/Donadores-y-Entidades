@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "entidades")
@@ -19,5 +21,17 @@ public class EntidadBenefica {
     private String domicilio;
     private String telefono;
     private String correo;
+    @OneToMany(
+            mappedBy = "entidad",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<NecesidadMaterial> necesidades = new ArrayList<>();
+
+
+
+    public void agregarNecesidad(NecesidadMaterial necesidad) {
+        this.necesidades.add(necesidad);
+    }
 
 }

@@ -99,7 +99,9 @@ public class Fachada implements FachadaDonadoresYEntidades {
     //se guarda en InMemory, cambiar esto cuando usemos persistencia
     donador.setEstado(estado);
 
-    return donadoresYEntidadesDataMapper.toDonadorDTO(donador);
+    Donador donadorGuardado = donadoresRepository.save(donador);
+
+    return donadoresYEntidadesDataMapper.toDonadorDTO(donadorGuardado);
   }
 
   @Override
@@ -116,10 +118,9 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     donador.setCategoria(categoria);
 
-    // this.donadoresRepository.deleteById(donadorID);
-    // this.donadoresRepository.save(donador);
+    Donador donadorGuardado = donadoresRepository.save(donador);
 
-    return donadoresYEntidadesDataMapper.toDonadorDTO(donador);
+    return donadoresYEntidadesDataMapper.toDonadorDTO(donadorGuardado);
   }
 
 /*
@@ -309,9 +310,13 @@ public class Fachada implements FachadaDonadoresYEntidades {
     NecesidadMaterial necesidad =
             donadoresYEntidadesDataMapper.toNecesidad(necesidadMaterialDTO);
 
-  /*  if (necesidad.getId() == null) {
-      necesidad.setId(java.util.UUID.randomUUID().toString());
-    } */
+    EntidadBenefica entidad = entidadesRepository
+            .findById(necesidadMaterialDTO.entidadID())
+            .orElseThrow();
+
+    necesidad.setEntidad(entidad);
+
+    entidad.agregarNecesidad(necesidad);
 
     NecesidadMaterial necesidadGuardada =
             necesidadesRepository.save(necesidad);
@@ -321,13 +326,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
   //IMPLEMENTADO
   @Override
-  public QuejaDTO agregarQueja(QuejaDTO quejaDTO) {
+  public QuejaDTO agregarQueja(String donadorID,
+                               QuejaDTO quejaDTO) {
 
     if (quejaDTO == null) {
       throw new RuntimeException();
     }
     Donador donador = donadoresRepository
-            .findById(quejaDTO.donadorID())
+            .findById(donadorID)
             .orElse(null);
     //VALIDAR DUPLICADO SOLO POR ID DEL DTO
     if (quejaDTO.id() != null) {

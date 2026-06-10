@@ -15,8 +15,9 @@ public interface FachadaDonadoresYEntidades {
   EntidadBeneficaDTO buscarEntidadPorID(String entidadID) throws NoSuchElementException;
 
   NecesidadMaterialDTO registrarNecesidad(NecesidadMaterialDTO necesidadMaterialDTO);
-
-  QuejaDTO agregarQueja(QuejaDTO quejaDTO) throws NoSuchElementException;
+//cambio
+  QuejaDTO agregarQueja(String donadorID,
+                        QuejaDTO quejaDTO) throws NoSuchElementException;
 
   Boolean puedeDonar(String donadorID) throws NoSuchElementException;
 

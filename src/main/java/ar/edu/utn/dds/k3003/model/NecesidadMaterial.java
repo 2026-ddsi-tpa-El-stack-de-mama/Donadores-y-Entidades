@@ -16,7 +16,10 @@ public class NecesidadMaterial {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String entidadID;
+    //private String entidadID;
+    @ManyToOne
+    @JoinColumn(name = "entidad_id")
+    private EntidadBenefica entidad;
     private Integer nivelDeUrgencia;
     private String descripcion;
     private Integer cantidadObjetivo;

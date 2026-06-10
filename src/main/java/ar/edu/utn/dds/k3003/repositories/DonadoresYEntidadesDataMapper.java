@@ -73,7 +73,8 @@ public class DonadoresYEntidadesDataMapper {
 
     return new NecesidadMaterialDTO(
             necesidad.getId(),
-            necesidad.getEntidadID(),
+            //necesidad.getEntidadID(),
+            necesidad.getEntidad().getId(),
             necesidad.getNivelDeUrgencia(),
             necesidad.getDescripcion(),
             necesidad.getCantidadObjetivo(),
@@ -88,7 +89,7 @@ public class DonadoresYEntidadesDataMapper {
     NecesidadMaterial necesidad = new NecesidadMaterial();
 
     necesidad.setId(dto.id());
-    necesidad.setEntidadID(dto.entidadID());
+    //necesidad.setEntidadID(dto.entidadID());
     necesidad.setNivelDeUrgencia(dto.nivelDeUrgencia());
     necesidad.setDescripcion(dto.descripcion());
     necesidad.setProductoSolicitadoID(dto.productoSolicitadoID());
