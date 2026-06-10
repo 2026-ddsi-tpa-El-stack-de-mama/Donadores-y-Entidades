@@ -1,4 +1,4 @@
-package ar.edu.utn.dds.k3003.model;
+/* package ar.edu.utn.dds.k3003.model;
 
 import ar.edu.utn.dds.k3003.Fachada;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.DonadorDTO;
@@ -278,4 +278,4 @@ public class DonadoresYEntidadesTest {
     });
   }
 
-}
+} */

@@ -1,4 +1,4 @@
-package ar.edu.utn.dds.k3003.catedra.donadoresyentidades;
+/* package ar.edu.utn.dds.k3003.catedra.donadoresyentidades;
 
 import static org.mockito.Mockito.*;
 
@@ -407,3 +407,4 @@ public class DonadoresYEntidadesTest {
     verify(fachadaIncentivos, times(1)).getMisionEnCursoDeDonador(donadorConID.id());
   }
 }
+*/

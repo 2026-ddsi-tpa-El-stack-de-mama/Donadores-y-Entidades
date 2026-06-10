@@ -30,12 +30,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
   private DonadoresRepository donadoresRepository;
   private EntidadesRepository entidadesRepository;
   private NecesidadesRepository necesidadesRepository;
+  private QuejasRepository quejasRepository;
 
   private FachadaIncentivos fachadaIncentivos;
 
   public Fachada(DonadoresRepository donadoresRepository,
                  EntidadesRepository entidadesRepository,
-                 NecesidadesRepository necesidadesRepository) {
+                 NecesidadesRepository necesidadesRepository,
+                 QuejasRepository quejasRepository) {
     /*
     Para que se ejecuten correctamente los tests, se necesita tener un constructor vacio
     Es decir, que no reciba parametros.
@@ -46,6 +48,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     this.donadoresRepository = donadoresRepository;
     this.entidadesRepository = entidadesRepository;
     this.necesidadesRepository = necesidadesRepository;
+    this.quejasRepository = quejasRepository;
   }
 
 
@@ -158,6 +161,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     }
   }
 
+  /*
   //IMPLEMENTADO
   @Override
   public List<QuejaDTO> obtenerQuejasDe(String donadorID) throws NoSuchElementException {
@@ -168,6 +172,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
     }
 
     return donador.getQuejas()
+            .stream()
+            .map(donadoresYEntidadesDataMapper::toQuejaDTO)
+            .toList();
+  } */
+  @Override
+  public List<QuejaDTO> obtenerQuejasDe(String donadorID) {
+
+    return quejasRepository.findByDonadorID(donadorID)
             .stream()
             .map(donadoresYEntidadesDataMapper::toQuejaDTO)
             .toList();
@@ -301,27 +313,25 @@ public class Fachada implements FachadaDonadoresYEntidades {
     if (quejaDTO == null) {
       throw new RuntimeException();
     }
-
     Donador donador = donadoresRepository
             .findById(quejaDTO.donadorID())
             .orElse(null);
-
     //VALIDAR DUPLICADO SOLO POR ID DEL DTO
     if (quejaDTO.id() != null) {
       throw new RuntimeException();
     }
-
     Queja queja = donadoresYEntidadesDataMapper.toQueja(quejaDTO);
-
-    if (queja.getId() == null) {
+   /* if (queja.getId() == null) {
       queja.setId(java.util.UUID.randomUUID().toString());
+    } */
+    if (donador == null) {
+      throw new RuntimeException();
     }
+    queja.setDonadorID(donador.getId());
 
-    if (donador != null) {
-      donador.agregarQueja(queja);
-    }
+    Queja quejaGuardada = quejasRepository.save(queja);
 
-    return donadoresYEntidadesDataMapper.toQuejaDTO(queja);
+    return donadoresYEntidadesDataMapper.toQuejaDTO(quejaGuardada);
   }
 
   //Nuevo necesidades insatisfechas por productoID
