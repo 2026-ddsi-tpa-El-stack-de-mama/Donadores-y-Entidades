@@ -106,7 +106,7 @@ public class DonadoresYEntidadesDataMapper {
     return new QuejaDTO(
             queja.getId(),
             queja.getDonacionID(),
-            queja.getDonadorID(),
+            queja.getDonador().getId(),
             queja.getFecha(),
             queja.getDescripcion()
     );
@@ -116,8 +116,9 @@ public class DonadoresYEntidadesDataMapper {
 
     Queja queja = new Queja();
 
+    queja.setId(dto.id());
     queja.setDonacionID(dto.donacionID());
-    queja.setDonadorID(dto.donadorID());
+    //queja.setDonadorID(dto.donadorID());
     queja.setFecha(dto.fecha());
     queja.setDescripcion(dto.descripcion());
 

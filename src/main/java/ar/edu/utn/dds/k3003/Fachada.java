@@ -176,10 +176,23 @@ public class Fachada implements FachadaDonadoresYEntidades {
             .map(donadoresYEntidadesDataMapper::toQuejaDTO)
             .toList();
   } */
+  /*
   @Override
   public List<QuejaDTO> obtenerQuejasDe(String donadorID) {
 
     return quejasRepository.findByDonadorID(donadorID)
+            .stream()
+            .map(donadoresYEntidadesDataMapper::toQuejaDTO)
+            .toList();
+  } */
+  @Override
+  public List<QuejaDTO> obtenerQuejasDe(String donadorID) {
+
+    Donador donador = donadoresRepository
+            .findById(donadorID)
+            .orElseThrow();
+
+    return donador.getQuejas()
             .stream()
             .map(donadoresYEntidadesDataMapper::toQuejaDTO)
             .toList();
@@ -327,7 +340,9 @@ public class Fachada implements FachadaDonadoresYEntidades {
     if (donador == null) {
       throw new RuntimeException();
     }
-    queja.setDonadorID(donador.getId());
+    queja.setDonador(donador);
+
+    donador.agregarQueja(queja);
 
     Queja quejaGuardada = quejasRepository.save(queja);
 

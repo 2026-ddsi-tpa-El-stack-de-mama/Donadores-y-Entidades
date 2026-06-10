@@ -32,11 +32,11 @@ public class Donador {
 
   private String categoria;
 
-  /*@OneToMany(
+  @OneToMany(
+          mappedBy = "donador",
           cascade = CascadeType.ALL,
           orphanRemoval = true
-  )*/
-  @Transient
+  )
   private List<Queja> quejas = new ArrayList<>();
 
   //public Donador() {}

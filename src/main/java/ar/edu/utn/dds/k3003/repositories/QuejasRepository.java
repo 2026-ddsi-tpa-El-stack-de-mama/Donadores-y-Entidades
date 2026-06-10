@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface QuejasRepository
         extends JpaRepository<Queja, String> {
-    List<Queja> findByDonadorID(String donadorID);
+    // List<Queja> findByDonadorID(String donadorID);
 }

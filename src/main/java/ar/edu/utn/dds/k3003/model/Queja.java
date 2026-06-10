@@ -18,7 +18,9 @@ public class Queja {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String donacionID;
-    private String donadorID;
+    @ManyToOne
+    @JoinColumn(name = "donador_id")
+    private Donador donador;
     private LocalDate fecha;
     private String descripcion;
 
