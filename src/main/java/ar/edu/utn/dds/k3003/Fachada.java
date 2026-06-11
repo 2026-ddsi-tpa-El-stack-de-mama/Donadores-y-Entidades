@@ -13,11 +13,14 @@ import ar.edu.utn.dds.k3003.model.NecesidadMaterial;
 import ar.edu.utn.dds.k3003.model.Queja;
 import ar.edu.utn.dds.k3003.repositories.*;
 
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import lombok.val;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import static ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.TipoNecesidadMaterialEnum.RECURRENTE;
 
@@ -96,7 +99,6 @@ public class Fachada implements FachadaDonadoresYEntidades {
       throw new RuntimeException();
     }
 
-    //se guarda en InMemory, cambiar esto cuando usemos persistencia
     donador.setEstado(estado);
 
     Donador donadorGuardado = donadoresRepository.save(donador);
@@ -162,30 +164,6 @@ public class Fachada implements FachadaDonadoresYEntidades {
     }
   }
 
-  /*
-  //IMPLEMENTADO
-  @Override
-  public List<QuejaDTO> obtenerQuejasDe(String donadorID) throws NoSuchElementException {
-    Donador donador = donadoresRepository.findById(donadorID).orElse(null);
-
-    if (donador == null) {
-      throw new RuntimeException();
-    }
-
-    return donador.getQuejas()
-            .stream()
-            .map(donadoresYEntidadesDataMapper::toQuejaDTO)
-            .toList();
-  } */
-  /*
-  @Override
-  public List<QuejaDTO> obtenerQuejasDe(String donadorID) {
-
-    return quejasRepository.findByDonadorID(donadorID)
-            .stream()
-            .map(donadoresYEntidadesDataMapper::toQuejaDTO)
-            .toList();
-  } */
   @Override
   public List<QuejaDTO> obtenerQuejasDe(String donadorID) {
 
@@ -228,7 +206,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     return donadoresYEntidadesDataMapper.toNecesidadDTO(necesidad);
   }
 
-  //IMPLEMENTADO
+ /* //IMPLEMENTADO
   @Override
   public DonadorStatsDTO estadisticasDonador(String donadorID) {
 
@@ -254,6 +232,71 @@ public class Fachada implements FachadaDonadoresYEntidades {
             donador.getEdad(),
             donador.getEstado(),
             donador.getCategoria(),
+            misionActualID,
+            insigniasID
+    );
+  } */
+
+  //nuevo TP3
+  @Override
+  public DonadorStatsDTO estadisticasDonador(String donadorID) {
+
+    Donador donador = donadoresRepository
+            .findById(donadorID)
+            .orElseThrow();
+
+    RestTemplate restTemplate = new RestTemplate();
+
+    String baseUrl =
+            "https://entrega-2-cesartomasg.onrender.com";
+
+    String misionActualID = null;
+    List<String> insigniasID = new ArrayList<>();
+
+    try {
+
+      MisionExternaDTO mision =
+              restTemplate.getForObject(
+                      baseUrl
+                              + "/misiones/donadores/"
+                              + donadorID
+                              + "/mision",
+                      MisionExternaDTO.class);
+
+      if (mision != null) {
+        misionActualID = mision.id();
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    try {
+
+      InsigniaExternaDTO[] insignias =
+              restTemplate.getForObject(
+                      baseUrl
+                              + "/insignias/donadores/"
+                              + donadorID,
+                      InsigniaExternaDTO[].class);
+
+      if (insignias != null) {
+        insigniasID =
+                Arrays.stream(insignias)
+                        .map(InsigniaExternaDTO::id)
+                        .toList();
+      }
+
+    } catch (Exception ignored) {
+    }
+
+    return new DonadorStatsDTO(
+            donador.getId(),
+            donador.getNombre(),
+            donador.getApellido(),
+            donador.getEdad(),
+            donador.getEstado(),
+            donador.getCategoria().toString(),
             misionActualID,
             insigniasID
     );
@@ -349,6 +392,18 @@ public class Fachada implements FachadaDonadoresYEntidades {
     queja.setDonador(donador);
 
     donador.agregarQueja(queja);
+
+    donador.agregarQueja(queja);
+
+    int cantidadQuejas = donador.getQuejas().size();
+
+    if (cantidadQuejas >= 10) {
+      donador.setEstado(EstadoDonadorEnum.BANEADO);
+    } else if (cantidadQuejas >= 5) {
+      donador.setEstado(EstadoDonadorEnum.SOSPECHOSO);
+    }
+
+    donadoresRepository.save(donador);
 
     Queja quejaGuardada = quejasRepository.save(queja);
 
