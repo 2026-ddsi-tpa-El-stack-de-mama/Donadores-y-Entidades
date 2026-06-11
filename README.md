@@ -13,13 +13,13 @@
 ---
 
 🧩 Componente Desarrollado
-- https://app.swaggerhub.com/apis/utn-f4b/2026-ddsi-tpa-donadores-y-entidades/1.0.0
+- https://app.swaggerhub.com/apis/utn-f4b/donadores-y-entidades/1.0.0
 
 🧩 Link al despliegue en Render
-- https://entrega-2-abelvergara88.onrender.com
+- https://donadores-y-entidades-ngp3.onrender.com/
 
 🧩 Link Swagger
-- https://entrega-2-abelvergara88.onrender.com/swagger-ui/index.html
+- https://donadores-y-entidades-ngp3.onrender.com/swagger-ui/index.html
 
 ---
 
