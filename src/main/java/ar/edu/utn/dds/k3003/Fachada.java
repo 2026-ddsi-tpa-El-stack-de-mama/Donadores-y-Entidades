@@ -383,15 +383,11 @@ public class Fachada implements FachadaDonadoresYEntidades {
       throw new RuntimeException();
     }
     Queja queja = donadoresYEntidadesDataMapper.toQueja(quejaDTO);
-   /* if (queja.getId() == null) {
-      queja.setId(java.util.UUID.randomUUID().toString());
-    } */
+
     if (donador == null) {
       throw new RuntimeException();
     }
     queja.setDonador(donador);
-
-    donador.agregarQueja(queja);
 
     donador.agregarQueja(queja);
 
