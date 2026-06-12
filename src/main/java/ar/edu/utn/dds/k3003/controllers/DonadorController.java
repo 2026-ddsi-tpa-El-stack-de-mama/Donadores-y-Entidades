@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Service;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 
 import java.util.List;
 
@@ -17,15 +19,26 @@ import java.util.List;
 public class DonadorController {
 
   private final Fachada fachada;
+  private final Counter consultasDonadores;
+  private final Counter donadoresCreados;
+  private final Counter categoriasModificadas;
 
-  public DonadorController(Fachada fachada) {
+  public DonadorController(Fachada fachada, MeterRegistry meterRegistry) {
     this.fachada = fachada;
+    this.consultasDonadores =
+            meterRegistry.counter("donadores.consultas");
+    this.donadoresCreados =
+            meterRegistry.counter("donadores.creados");
+    this.categoriasModificadas =
+            meterRegistry.counter("donadores.categoria_modificada");
   }
 
   @PostMapping
   public ResponseEntity<DonadorDTO> agregarDonador(
           @RequestBody DonadorDTO donadorDTO
   ) {
+
+    donadoresCreados.increment();
 
     return ResponseEntity.ok(
             fachada.agregarDonador(donadorDTO)
@@ -34,6 +47,8 @@ public class DonadorController {
 
   @GetMapping
   public ResponseEntity<List<DonadorDTO>> obtenerDonadores() {
+
+    consultasDonadores.increment();
 
     return ResponseEntity.ok(
             fachada.buscarDonadores()
@@ -66,6 +81,8 @@ public class DonadorController {
           @PathVariable String id,
           @RequestParam String categoria
   ) {
+
+    categoriasModificadas.increment();
 
     return ResponseEntity.ok(
             fachada.modificarCategoria(id, categoria)

@@ -5,6 +5,8 @@ import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.NecesidadMaterialDT
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 
 import java.util.List;
 
@@ -13,15 +15,25 @@ import java.util.List;
 public class NecesidadController {
 
     private final Fachada fachada;
+    private final Counter necesidadesConsultas;
+    private final Counter necesidadesCreadas;
 
-    public NecesidadController(Fachada fachada) {
+    public NecesidadController(Fachada fachada, MeterRegistry meterRegistry) {
         this.fachada = fachada;
+
+        this.necesidadesConsultas =
+                meterRegistry.counter("necesidades.consultas");
+
+        this.necesidadesCreadas =
+                meterRegistry.counter("necesidades.creadas");
     }
 
     @PostMapping
     public ResponseEntity<NecesidadMaterialDTO> registrarNecesidad(
             @RequestBody NecesidadMaterialDTO necesidadDTO
     ) {
+
+        necesidadesCreadas.increment();
 
         return ResponseEntity.ok(
                 fachada.registrarNecesidad(necesidadDTO)
@@ -30,6 +42,8 @@ public class NecesidadController {
 
     @GetMapping
     public ResponseEntity<List<NecesidadMaterialDTO>> obtenerNecesidades() {
+
+        necesidadesConsultas.increment();
 
         return ResponseEntity.ok(
                 fachada.buscarNecesidades()
