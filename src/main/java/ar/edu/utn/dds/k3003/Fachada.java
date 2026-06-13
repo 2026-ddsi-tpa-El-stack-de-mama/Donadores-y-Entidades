@@ -275,25 +275,18 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     try {
 
-      InsigniasResponseDTO response =
+      String response =
               restTemplate.getForObject(
                       baseUrl
                               + "/insignias/donadores/"
                               + donadorID,
-                      InsigniasResponseDTO.class);
+                      String.class);
 
       System.out.println(response);
 
-      if (response != null && response.data() != null) {
-        insigniasID = response.data()
-                .stream()
-                .map(i -> i.id())
-                .toList();
-      }
-
     } catch (Exception e) {
-      System.out.println("ERROR INSIGNIAS");
       e.printStackTrace();
+
     }
 
     return new DonadorStatsDTO(
