@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import static ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.TipoNecesidadMaterialEnum.RECURRENTE;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.MisionResponseDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.InsigniasResponseDTO;
 
 @Service
 public class Fachada implements FachadaDonadoresYEntidades {
@@ -255,16 +257,16 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     try {
 
-      MisionExternaDTO mision =
+      MisionResponseDTO response =
               restTemplate.getForObject(
                       baseUrl
                               + "/misiones/donadores/"
                               + donadorID
                               + "/mision",
-                      MisionExternaDTO.class);
+                      MisionResponseDTO.class);
 
-      if (mision != null) {
-        misionActualID = mision.id();
+      if (response != null && response.data() != null) {
+        misionActualID = response.data().id();
       }
 
     } catch (Exception e) {
@@ -273,21 +275,22 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     try {
 
-      InsigniaExternaDTO[] insignias =
+      InsigniasResponseDTO response =
               restTemplate.getForObject(
                       baseUrl
                               + "/insignias/donadores/"
                               + donadorID,
-                      InsigniaExternaDTO[].class);
+                      InsigniasResponseDTO.class);
 
-      if (insignias != null) {
-        insigniasID =
-                Arrays.stream(insignias)
-                        .map(InsigniaExternaDTO::id)
-                        .toList();
+      if (response != null && response.data() != null) {
+        insigniasID = response.data()
+                .stream()
+                .map(i -> i.id())
+                .toList();
       }
 
-    } catch (Exception ignored) {
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
     return new DonadorStatsDTO(
