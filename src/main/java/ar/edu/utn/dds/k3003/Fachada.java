@@ -13,10 +13,7 @@ import ar.edu.utn.dds.k3003.model.NecesidadMaterial;
 import ar.edu.utn.dds.k3003.model.Queja;
 import ar.edu.utn.dds.k3003.repositories.*;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import lombok.val;
 import org.springframework.stereotype.Service;
@@ -273,20 +270,29 @@ public class Fachada implements FachadaDonadoresYEntidades {
       e.printStackTrace();
     }
 
+    Map response = null;
+
     try {
 
-      String response =
-              restTemplate.getForObject(
-                      baseUrl
-                              + "/insignias/donadores/"
-                              + donadorID,
-                      String.class);
+      response = restTemplate.getForObject(
+              baseUrl + "/insignias/donadores/" + donadorID,
+              Map.class);
 
       System.out.println(response);
 
     } catch (Exception e) {
       e.printStackTrace();
+    }
 
+    if (response != null) {
+
+      Map data = (Map) response.get("data");
+
+      System.out.println(data);
+
+      String insigniaId = (String) data.get("id");
+
+      insigniasID = List.of(insigniaId);
     }
 
     return new DonadorStatsDTO(
