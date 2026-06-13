@@ -64,9 +64,6 @@ class NecesidadesRepository {
   <<interface>>
 }
 
-class InMemoryDonadoresRepo
-class InMemoryEntidadesRepo
-class InMemoryNecesidadesRepo
 
 class DonadoresYEntidadesDataMapper
 
@@ -76,9 +73,6 @@ class DonadorController
 class EntidadController
 class NecesidadController
 
-DonadoresRepository <|.. InMemoryDonadoresRepo
-EntidadesRepository <|.. InMemoryEntidadesRepo
-NecesidadesRepository <|.. InMemoryNecesidadesRepo
 
 Donador "1" --> "*" Queja
 EntidadBenefica "1" --> "*" NecesidadMaterial
