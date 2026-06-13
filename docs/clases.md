@@ -64,6 +64,10 @@ class NecesidadesRepository {
   <<interface>>
 }
 
+class QuejasRepository {
+  <<interface>>
+}
+
 
 class DonadoresYEntidadesDataMapper
 
@@ -88,6 +92,7 @@ DonadoresYEntidadesDataMapper --> Queja
 Fachada --> DonadoresRepository
 Fachada --> EntidadesRepository
 Fachada --> NecesidadesRepository
+Fachada --> QuejasRepository
 Fachada --> DonadoresYEntidadesDataMapper
 
 DonadorController --> Fachada
