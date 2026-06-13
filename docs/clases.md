@@ -60,6 +60,8 @@ class EntidadesRepository {
   <<interface>>
 }
 
+class DonadoresYEntidadesDataMapper
+
 class NecesidadesRepository {
   <<interface>>
 }
@@ -68,8 +70,6 @@ class QuejasRepository {
   <<interface>>
 }
 
-
-class DonadoresYEntidadesDataMapper
 
 class Fachada
 
