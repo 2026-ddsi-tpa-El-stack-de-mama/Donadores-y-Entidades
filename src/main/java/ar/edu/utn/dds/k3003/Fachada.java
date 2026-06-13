@@ -282,6 +282,8 @@ public class Fachada implements FachadaDonadoresYEntidades {
                               + donadorID,
                       InsigniasResponseDTO.class);
 
+      System.out.println(response);
+
       if (response != null && response.data() != null) {
         insigniasID = response.data()
                 .stream()
@@ -290,6 +292,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
       }
 
     } catch (Exception e) {
+      System.out.println("ERROR INSIGNIAS");
       e.printStackTrace();
     }
 
