@@ -457,6 +457,31 @@ public class Fachada implements FachadaDonadoresYEntidades {
             .map(donadoresYEntidadesDataMapper::toNecesidadDTO)
             .toList();
   }
+
+  public EntidadBeneficaDTO modificarEntidad(
+          String entidadID,
+          EntidadBeneficaDTO entidadDTO) {
+
+    if (entidadDTO == null) {
+      throw new IllegalArgumentException("La entidad no puede ser null");
+    }
+
+    EntidadBenefica entidad = entidadesRepository
+            .findById(entidadID)
+            .orElseThrow(() ->
+                    new NoSuchElementException("Entidad no encontrada"));
+
+    entidad.setRazonSocial(entidadDTO.razonSocial());
+    entidad.setDomicilio(entidadDTO.domicilio());
+    entidad.setTelefono(entidadDTO.telefono());
+    entidad.setCorreo(entidadDTO.correo());
+
+    EntidadBenefica entidadActualizada =
+            entidadesRepository.save(entidad);
+
+    return donadoresYEntidadesDataMapper
+            .toEntidadDTO(entidadActualizada);
+  }
 }
 
 // asd

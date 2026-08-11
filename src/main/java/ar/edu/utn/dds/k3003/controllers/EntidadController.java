@@ -59,4 +59,15 @@ public class EntidadController {
                 fachada.buscarEntidadPorID(id)
         );
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EntidadBeneficaDTO> modificarEntidad(
+            @PathVariable String id,
+            @RequestBody EntidadBeneficaDTO entidadDTO
+    ) {
+
+        return ResponseEntity.ok(
+                fachada.modificarEntidad(id, entidadDTO)
+        );
+    }
 }
