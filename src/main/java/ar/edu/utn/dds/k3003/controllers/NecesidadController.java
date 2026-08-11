@@ -50,6 +50,17 @@ public class NecesidadController {
         );
     }
 
+    @GetMapping("/{necesidadID}")
+    public ResponseEntity<NecesidadMaterialDTO> obtenerNecesidad(
+            @PathVariable String necesidadID
+    ) {
+        necesidadesConsultas.increment();
+
+        return ResponseEntity.ok(
+                fachada.buscarNecesidadPorID(necesidadID)
+        );
+    }
+
     @GetMapping("/insatisfechas")
     public ResponseEntity<List<NecesidadMaterialDTO>> obtenerNecesidadesInsatisfechas(
             @RequestParam String productoId
@@ -71,5 +82,24 @@ public class NecesidadController {
                         cantidad
                 )
         );
+    }
+
+    @PutMapping("/{necesidadID}")
+    public ResponseEntity<NecesidadMaterialDTO> modificarNecesidad(
+            @PathVariable String necesidadID,
+            @RequestBody NecesidadMaterialDTO necesidadDTO
+    ) {
+        return ResponseEntity.ok(
+                fachada.modificarNecesidad(necesidadID, necesidadDTO)
+        );
+    }
+
+    @DeleteMapping("/{necesidadID}")
+    public ResponseEntity<Void> eliminarNecesidad(
+            @PathVariable String necesidadID
+    ) {
+        fachada.eliminarNecesidad(necesidadID);
+
+        return ResponseEntity.noContent().build();
     }
 }

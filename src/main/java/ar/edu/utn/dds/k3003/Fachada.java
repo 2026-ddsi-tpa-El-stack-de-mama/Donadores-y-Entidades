@@ -482,6 +482,71 @@ public class Fachada implements FachadaDonadoresYEntidades {
     return donadoresYEntidadesDataMapper
             .toEntidadDTO(entidadActualizada);
   }
+
+  //TP 4
+  public NecesidadMaterialDTO buscarNecesidadPorID(String necesidadID)
+          throws NoSuchElementException {
+
+    NecesidadMaterial necesidad = necesidadesRepository
+            .findById(necesidadID)
+            .orElseThrow(() ->
+                    new NoSuchElementException("Necesidad no encontrada"));
+
+    return donadoresYEntidadesDataMapper
+            .toNecesidadDTO(necesidad);
+  }
+
+  public NecesidadMaterialDTO modificarNecesidad(
+          String necesidadID,
+          NecesidadMaterialDTO necesidadDTO) {
+
+    if (necesidadDTO == null) {
+      throw new IllegalArgumentException(
+              "La necesidad no puede ser null"
+      );
+    }
+
+    NecesidadMaterial necesidad = necesidadesRepository
+            .findById(necesidadID)
+            .orElseThrow(() ->
+                    new NoSuchElementException(
+                            "Necesidad no encontrada"
+                    ));
+
+    necesidad.setProductoSolicitadoID(
+            necesidadDTO.productoSolicitadoID()
+    );
+
+    necesidad.setCantidadObjetivo(
+            necesidadDTO.cantidadObjetivo()
+    );
+
+    necesidad.setCantidadActual(
+            necesidadDTO.cantidadActual()
+    );
+
+    necesidad.setTipo(
+            necesidadDTO.tipo()
+    );
+
+    NecesidadMaterial necesidadActualizada =
+            necesidadesRepository.save(necesidad);
+
+    return donadoresYEntidadesDataMapper
+            .toNecesidadDTO(necesidadActualizada);
+  }
+
+  public void eliminarNecesidad(String necesidadID) {
+
+    NecesidadMaterial necesidad = necesidadesRepository
+            .findById(necesidadID)
+            .orElseThrow(() ->
+                    new NoSuchElementException(
+                            "Necesidad no encontrada"
+                    ));
+
+    necesidadesRepository.delete(necesidad);
+  }
 }
 
 // asd
