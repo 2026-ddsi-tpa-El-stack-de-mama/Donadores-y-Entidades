@@ -9,6 +9,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/necesidades")
@@ -95,11 +96,21 @@ public class NecesidadController {
     }
 
     @DeleteMapping("/{necesidadID}")
-    public ResponseEntity<Void> eliminarNecesidad(
+    public ResponseEntity<String> eliminarNecesidad(
             @PathVariable String necesidadID
     ) {
-        fachada.eliminarNecesidad(necesidadID);
+        try {
+            fachada.eliminarNecesidad(necesidadID);
 
-        return ResponseEntity.noContent().build();
+            return ResponseEntity.ok(
+                    "Necesidad " + necesidadID + " eliminada correctamente"
+            );
+
+        } catch (NoSuchElementException e) {
+
+            return ResponseEntity.status(404).body(
+                    "No se encontró la necesidad con ID: " + necesidadID
+            );
+        }
     }
 }
