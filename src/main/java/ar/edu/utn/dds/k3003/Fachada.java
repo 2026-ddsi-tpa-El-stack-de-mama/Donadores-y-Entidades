@@ -326,7 +326,9 @@ public class Fachada implements FachadaDonadoresYEntidades {
     String misionActualID = null;
     List<String> insigniasID = new ArrayList<>();
 
+    // =========================
     // Obtener misión actual
+    // =========================
     try {
 
       MisionResponseDTO response =
@@ -346,46 +348,46 @@ public class Fachada implements FachadaDonadoresYEntidades {
       e.printStackTrace();
     }
 
-    // Obtener insignias del donador
-    /*
+
+    // =========================
+    // Obtener insignias
+    // =========================
     try {
 
-      InsigniasResponseDTO response =
+      Map<String, Object> response =
               restTemplate.getForObject(
                       baseUrl
                               + "/insignias/donadores/"
                               + donadorID,
-                      InsigniasResponseDTO.class
+                      Map.class
               );
 
-      if (response != null && response.data() != null) {
-
-        insigniasID = response.data()
-                .stream()
-                .map(insignia -> insignia.id())
-                .toList();
-      }
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    } */
-    try {
-
-      String response =
-              restTemplate.getForObject(
-                      baseUrl
-                              + "/insignias/donadores/"
-                              + donadorID,
-                      String.class
-              );
-
-      System.out.println("RESPUESTA RAW DE INCENTIVOS:");
+      System.out.println("RESPUESTA DE INSIGNIAS:");
       System.out.println(response);
+
+      if (response != null && response.get("data") != null) {
+
+        List<Map<String, Object>> data =
+                (List<Map<String, Object>>) response.get("data");
+
+        for (Map<String, Object> insignia : data) {
+
+          Object id = insignia.get("id");
+
+          if (id != null) {
+            insigniasID.add(id.toString());
+          }
+        }
+      }
 
     } catch (Exception e) {
       e.printStackTrace();
     }
 
+
+    // =========================
+    // Armar estadísticas
+    // =========================
     return new DonadorStatsDTO(
             donador.getId(),
             donador.getNombre(),
