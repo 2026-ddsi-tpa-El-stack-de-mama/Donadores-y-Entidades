@@ -7,10 +7,7 @@ import ar.edu.utn.dds.k3003.catedra.fachadas.FachadaDonadoresYEntidades;
 import ar.edu.utn.dds.k3003.catedra.fachadas.FachadaIncentivos;
 import ar.edu.utn.dds.k3003.exceptions.DonadorNoEncontradoException;
 import ar.edu.utn.dds.k3003.exceptions.DonadorYaExistenteException;
-import ar.edu.utn.dds.k3003.model.Donador;
-import ar.edu.utn.dds.k3003.model.EntidadBenefica;
-import ar.edu.utn.dds.k3003.model.NecesidadMaterial;
-import ar.edu.utn.dds.k3003.model.Queja;
+import ar.edu.utn.dds.k3003.model.*;
 import ar.edu.utn.dds.k3003.repositories.*;
 
 import java.util.*;
@@ -22,6 +19,8 @@ import org.springframework.web.client.RestTemplate;
 import static ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.TipoNecesidadMaterialEnum.RECURRENTE;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.MisionResponseDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.InsigniasResponseDTO;
+import ar.edu.utn.dds.k3003.model.HistorialEstadoDonador;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.HistorialEstadoDonadorDTO;
 
 @Service
 public class Fachada implements FachadaDonadoresYEntidades {
@@ -35,11 +34,13 @@ public class Fachada implements FachadaDonadoresYEntidades {
   private QuejasRepository quejasRepository;
 
   private FachadaIncentivos fachadaIncentivos;
+  private HistorialEstadoDonadorRepository historialEstadoDonadorRepository;
 
   public Fachada(DonadoresRepository donadoresRepository,
                  EntidadesRepository entidadesRepository,
                  NecesidadesRepository necesidadesRepository,
-                 QuejasRepository quejasRepository) {
+                 QuejasRepository quejasRepository,
+                 HistorialEstadoDonadorRepository historialEstadoDonadorRepository) {
     /*
     Para que se ejecuten correctamente los tests, se necesita tener un constructor vacio
     Es decir, que no reciba parametros.
@@ -51,6 +52,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     this.entidadesRepository = entidadesRepository;
     this.necesidadesRepository = necesidadesRepository;
     this.quejasRepository = quejasRepository;
+    this.historialEstadoDonadorRepository = historialEstadoDonadorRepository;
   }
 
 
@@ -85,7 +87,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     return donadoresYEntidadesDataMapper.toDonadorDTO(donadorFinal);
   }
 
-  //IMPLEMENTADO
+  /* //IMPLEMENTADO
   @Override
   public DonadorDTO modificarEstado(String donadorID, EstadoDonadorEnum estado) {
 
@@ -103,6 +105,55 @@ public class Fachada implements FachadaDonadoresYEntidades {
     Donador donadorGuardado = donadoresRepository.save(donador);
 
     return donadoresYEntidadesDataMapper.toDonadorDTO(donadorGuardado);
+  } */
+  @Override
+  public DonadorDTO modificarEstado(String donadorID, EstadoDonadorEnum estado) {
+
+    Donador donador = donadoresRepository.findById(donadorID).orElse(null);
+
+    if (donador == null) {
+      throw new RuntimeException();
+    }
+
+    if (estado == null) {
+      throw new RuntimeException();
+    }
+
+    EstadoDonadorEnum estadoAnterior = donador.getEstado();
+
+    donador.setEstado(estado);
+
+    Donador donadorGuardado = donadoresRepository.save(donador);
+
+    HistorialEstadoDonador historial = new HistorialEstadoDonador(
+            donadorGuardado,
+            estadoAnterior,
+            estado
+    );
+
+    historialEstadoDonadorRepository.save(historial);
+
+    return donadoresYEntidadesDataMapper.toDonadorDTO(donadorGuardado);
+  }
+
+  public List<HistorialEstadoDonadorDTO> obtenerHistorialEstado(String donadorID) {
+
+    Donador donador = donadoresRepository.findById(donadorID).orElse(null);
+
+    if (donador == null) {
+      throw new RuntimeException();
+    }
+
+    List<HistorialEstadoDonador> historial =
+            historialEstadoDonadorRepository.findByDonadorId(donadorID);
+
+    return historial.stream()
+            .map(h -> new HistorialEstadoDonadorDTO(
+                    h.getEstadoAnterior(),
+                    h.getEstadoNuevo(),
+                    h.getFechaCambio()
+            ))
+            .toList();
   }
 
   @Override
@@ -204,110 +255,6 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     return donadoresYEntidadesDataMapper.toNecesidadDTO(necesidad);
   }
-
- /* //IMPLEMENTADO
-  @Override
-  public DonadorStatsDTO estadisticasDonador(String donadorID) {
-
-    Donador donador = donadoresRepository
-            .findById(donadorID)
-            .orElseThrow(() -> new NoSuchElementException("Donador no encontrado"));
-
-    List<InsigniaDTO> insignias = fachadaIncentivos.getInsigniasDeDonador(donadorID);
-
-    MisionDTO mision = fachadaIncentivos.getMisionEnCursoDeDonador(donadorID);
-
-    List<String> insigniasID = insignias
-            .stream()
-            .map(InsigniaDTO::id)
-            .toList();
-
-    String misionActualID = mision != null ? mision.id() : null;
-
-    return new DonadorStatsDTO(
-            donador.getId(),
-            donador.getNombre(),
-            donador.getApellido(),
-            donador.getEdad(),
-            donador.getEstado(),
-            donador.getCategoria(),
-            misionActualID,
-            insigniasID
-    );
-  } */
-
-  /*
-  //nuevo TP3
-  @Override
-  public DonadorStatsDTO estadisticasDonador(String donadorID) {
-
-    Donador donador = donadoresRepository
-            .findById(donadorID)
-            .orElseThrow();
-
-    RestTemplate restTemplate = new RestTemplate();
-
-    String baseUrl =
-            "https://entrega-2-cesartomasg.onrender.com";
-    //      "https://entrega-2-cesartomasg-produccion.onrender.com";
-
-    String misionActualID = null;
-    List<String> insigniasID = new ArrayList<>();
-
-    try {
-
-      MisionResponseDTO response =
-              restTemplate.getForObject(
-                      baseUrl
-                              + "/misiones/donadores/"
-                              + donadorID
-                              + "/mision",
-                      MisionResponseDTO.class);
-
-      if (response != null && response.data() != null) {
-        misionActualID = response.data().id();
-      }
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    Map response = null;
-
-    try {
-
-      response = restTemplate.getForObject(
-              baseUrl + "/insignias/donadores/" + donadorID,
-              Map.class);
-
-      System.out.println(response);
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    if (response != null) {
-
-      Map data = (Map) response.get("data");
-
-      System.out.println(data);
-
-      String insigniaId = (String) data.get("id");
-
-      insigniasID = List.of(insigniaId);
-    }
-
-    return new DonadorStatsDTO(
-            donador.getId(),
-            donador.getNombre(),
-            donador.getApellido(),
-            donador.getEdad(),
-            donador.getEstado(),
-            donador.getCategoria().toString(),
-            misionActualID,
-            insigniasID
-    );
-  }  */
 
   // NUEVO - TP3 corregido por cambio de respuesta de Incentivos
   @Override

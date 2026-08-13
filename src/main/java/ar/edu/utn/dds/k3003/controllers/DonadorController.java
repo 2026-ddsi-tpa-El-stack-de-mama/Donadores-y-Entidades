@@ -1,10 +1,7 @@
 package ar.edu.utn.dds.k3003.controllers;
 
 import ar.edu.utn.dds.k3003.Fachada;
-import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.DonadorDTO;
-import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.DonadorStatsDTO;
-import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EstadoDonadorEnum;
-import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.QuejaDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -136,6 +133,13 @@ public class DonadorController {
     return ResponseEntity.ok(
             fachada.obtenerQuejasDe(id)
     );
+  }
+
+  @GetMapping("/{id}/historial-estados")
+  public List<HistorialEstadoDonadorDTO> obtenerHistorialEstado(
+          @PathVariable String id) {
+
+    return fachada.obtenerHistorialEstado(id);
   }
 }
 /*
