@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "historial_estado_donador")
@@ -39,6 +40,6 @@ public class HistorialEstadoDonador {
         this.donador = donador;
         this.estadoAnterior = estadoAnterior;
         this.estadoNuevo = estadoNuevo;
-        this.fechaCambio = LocalDateTime.now();
+        this.fechaCambio = LocalDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires"));
     }
 }
