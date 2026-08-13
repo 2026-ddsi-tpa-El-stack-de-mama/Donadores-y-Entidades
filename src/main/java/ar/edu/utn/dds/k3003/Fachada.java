@@ -347,6 +347,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     }
 
     // Obtener insignias del donador
+    /*
     try {
 
       InsigniasResponseDTO response =
@@ -364,6 +365,22 @@ public class Fachada implements FachadaDonadoresYEntidades {
                 .map(insignia -> insignia.id())
                 .toList();
       }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    } */
+    try {
+
+      String response =
+              restTemplate.getForObject(
+                      baseUrl
+                              + "/insignias/donadores/"
+                              + donadorID,
+                      String.class
+              );
+
+      System.out.println("RESPUESTA RAW DE INCENTIVOS:");
+      System.out.println(response);
 
     } catch (Exception e) {
       e.printStackTrace();
