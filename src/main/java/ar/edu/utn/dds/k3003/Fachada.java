@@ -236,6 +236,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     );
   } */
 
+  /*
   //nuevo TP3
   @Override
   public DonadorStatsDTO estadisticasDonador(String donadorID) {
@@ -294,6 +295,78 @@ public class Fachada implements FachadaDonadoresYEntidades {
       String insigniaId = (String) data.get("id");
 
       insigniasID = List.of(insigniaId);
+    }
+
+    return new DonadorStatsDTO(
+            donador.getId(),
+            donador.getNombre(),
+            donador.getApellido(),
+            donador.getEdad(),
+            donador.getEstado(),
+            donador.getCategoria().toString(),
+            misionActualID,
+            insigniasID
+    );
+  }  */
+
+  // NUEVO - TP3 corregido por cambio de respuesta de Incentivos
+  @Override
+  public DonadorStatsDTO estadisticasDonador(String donadorID) {
+
+    Donador donador = donadoresRepository
+            .findById(donadorID)
+            .orElseThrow(() ->
+                    new NoSuchElementException("Donador no encontrado"));
+
+    RestTemplate restTemplate = new RestTemplate();
+
+    String baseUrl =
+            "https://entrega-2-cesartomasg.onrender.com";
+
+    String misionActualID = null;
+    List<String> insigniasID = new ArrayList<>();
+
+    // Obtener misión actual
+    try {
+
+      MisionResponseDTO response =
+              restTemplate.getForObject(
+                      baseUrl
+                              + "/misiones/donadores/"
+                              + donadorID
+                              + "/mision",
+                      MisionResponseDTO.class
+              );
+
+      if (response != null && response.data() != null) {
+        misionActualID = response.data().id();
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    // Obtener insignias del donador
+    try {
+
+      InsigniasResponseDTO response =
+              restTemplate.getForObject(
+                      baseUrl
+                              + "/insignias/donadores/"
+                              + donadorID,
+                      InsigniasResponseDTO.class
+              );
+
+      if (response != null && response.data() != null) {
+
+        insigniasID = response.data()
+                .stream()
+                .map(insignia -> insignia.id())
+                .toList();
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
     return new DonadorStatsDTO(
