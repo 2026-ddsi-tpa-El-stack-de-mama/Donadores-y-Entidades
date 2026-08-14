@@ -13,6 +13,7 @@ import ar.edu.utn.dds.k3003.repositories.*;
 import java.util.*;
 
 import lombok.val;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,6 +22,7 @@ import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.MisionResponseDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.InsigniasResponseDTO;
 import ar.edu.utn.dds.k3003.model.HistorialEstadoDonador;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.HistorialEstadoDonadorDTO;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class Fachada implements FachadaDonadoresYEntidades {
@@ -439,7 +441,8 @@ public class Fachada implements FachadaDonadoresYEntidades {
     try {
       restTemplate.getForObject(urlProducto, String.class);
     } catch (Exception e) {
-      throw new RuntimeException(
+      throw new ResponseStatusException(
+              HttpStatus.NOT_FOUND,
               "El producto solicitado no existe en Donaciones"
       );
     }
