@@ -32,6 +32,11 @@ public class NecesidadController {
                 meterRegistry.counter("necesidades.creadas");
     }
 
+    @Operation(summary = "Crear una necesidad")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Necesidad creada"),
+            @ApiResponse(responseCode = "404", description = "El producto solicitado no existe en Donaciones")
+    })
     @PostMapping
     public ResponseEntity<NecesidadMaterialDTO> registrarNecesidad(
             @RequestBody NecesidadMaterialDTO necesidadDTO
@@ -74,11 +79,6 @@ public class NecesidadController {
         );
     }
 
-    @Operation(summary = "Crear una necesidad")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Necesidad creada"),
-            @ApiResponse(responseCode = "404", description = "El producto solicitado no existe en Donaciones")
-    })
     @PostMapping("/{necesidadID}/satisfaccion")
     public ResponseEntity<NecesidadMaterialDTO> satisfacerNecesidad(
             @PathVariable String necesidadID,
