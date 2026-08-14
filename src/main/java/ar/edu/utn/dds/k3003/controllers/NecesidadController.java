@@ -3,6 +3,9 @@ package ar.edu.utn.dds.k3003.controllers;
 import ar.edu.utn.dds.k3003.Fachada;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.NecesidadMaterialDTO;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.micrometer.core.instrument.Counter;
@@ -71,6 +74,11 @@ public class NecesidadController {
         );
     }
 
+    @Operation(summary = "Crear una necesidad")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Necesidad creada"),
+            @ApiResponse(responseCode = "404", description = "El producto solicitado no existe en Donaciones")
+    })
     @PostMapping("/{necesidadID}/satisfaccion")
     public ResponseEntity<NecesidadMaterialDTO> satisfacerNecesidad(
             @PathVariable String necesidadID,
