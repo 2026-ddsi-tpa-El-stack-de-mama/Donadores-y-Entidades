@@ -407,6 +407,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     return donadoresYEntidadesDataMapper.toNecesidadDTO(necesidadGuardada);
   } */
 
+  /*
   @Override
   public NecesidadMaterialDTO registrarNecesidad(
           NecesidadMaterialDTO necesidadMaterialDTO) {
@@ -520,6 +521,204 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     // =====================================================
     // 6. GUARDAR LA NECESIDAD
+    // =====================================================
+
+    NecesidadMaterial necesidadGuardada =
+            necesidadesRepository.save(necesidad);
+
+    return donadoresYEntidadesDataMapper
+            .toNecesidadDTO(necesidadGuardada);
+  } */
+  @Override
+  public NecesidadMaterialDTO registrarNecesidad(
+          NecesidadMaterialDTO necesidadMaterialDTO) {
+
+    if (necesidadMaterialDTO == null) {
+      throw new RuntimeException();
+    }
+
+    if (necesidadMaterialDTO.id() != null &&
+            necesidadesRepository.findById(necesidadMaterialDTO.id()).isPresent()) {
+      throw new RuntimeException();
+    }
+
+    String productoID = necesidadMaterialDTO.productoSolicitadoID();
+    Integer cantidadObjetivo = necesidadMaterialDTO.cantidadObjetivo();
+
+    if (productoID == null || cantidadObjetivo == null || cantidadObjetivo <= 0) {
+      throw new RuntimeException("Producto o cantidad inválida");
+    }
+
+    RestTemplate restTemplate = new RestTemplate();
+
+    // =====================================================
+    // 1. VALIDAR QUE EL PRODUCTO EXISTA EN DONACIONES
+    // =====================================================
+
+    String urlProducto =
+            "https://donaciones-ctwj.onrender.com/productos/"
+                    + productoID;
+
+    try {
+      restTemplate.getForObject(urlProducto, String.class);
+
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+              HttpStatus.NOT_FOUND,
+              "El producto solicitado no existe en Donaciones"
+      );
+    }
+
+    // =====================================================
+    // 2. CONSULTAR STOCK EN LOGÍSTICA
+    // =====================================================
+
+    String urlStock =
+            "https://logistica-jc94.onrender.com/stock/"
+                    + productoID;
+
+    String respuestaStock;
+
+    try {
+      respuestaStock =
+              restTemplate.getForObject(urlStock, String.class);
+
+    } catch (Exception e) {
+      throw new RuntimeException(
+              "No se pudo consultar el stock en Logística"
+      );
+    }
+
+    if (respuestaStock == null) {
+      throw new RuntimeException(
+              "Logística no devolvió información del stock"
+      );
+    }
+
+    // Ejemplo de respuesta:
+    // Cantidad: 19. Paquete: 0d6b8625-6518-4f2a-a949-232b609f3834
+
+    String[] partes = respuestaStock.split("\\. Paquete: ");
+
+    if (partes.length != 2) {
+      throw new RuntimeException(
+              "Respuesta inválida de Logística"
+      );
+    }
+
+    Integer stockDisponible;
+
+    try {
+      stockDisponible = Integer.parseInt(
+              partes[0]
+                      .replace("Cantidad:", "")
+                      .trim()
+      );
+    } catch (NumberFormatException e) {
+      throw new RuntimeException(
+              "Cantidad de stock inválida recibida desde Logística"
+      );
+    }
+
+    String paqueteID = partes[1].trim();
+
+    // =====================================================
+    // 3. CREAR LA NECESIDAD
+    // =====================================================
+
+    NecesidadMaterial necesidad =
+            donadoresYEntidadesDataMapper.toNecesidad(necesidadMaterialDTO);
+
+    EntidadBenefica entidad = entidadesRepository
+            .findById(necesidadMaterialDTO.entidadID())
+            .orElseThrow();
+
+    necesidad.setEntidad(entidad);
+    entidad.agregarNecesidad(necesidad);
+
+    // =====================================================
+    // 4. CALCULAR CUÁNTO SE PUEDE ASIGNAR
+    // =====================================================
+
+    int cantidadAsignada =
+            Math.min(cantidadObjetivo, stockDisponible);
+
+    // La cantidad actual comienza con lo disponible
+    necesidad.setCantidadActual(cantidadAsignada);
+
+    // =====================================================
+    // 5. RESTAR DEL STOCK Y HACER ASIGNACIÓN DIRECTA
+    // =====================================================
+
+    if (cantidadAsignada > 0) {
+
+      // -----------------------------------------------
+      // Restar stock en Logística
+      // -----------------------------------------------
+
+      try {
+
+        restTemplate.postForObject(
+                urlStock,
+                cantidadAsignada,
+                Integer.class
+        );
+
+      } catch (Exception e) {
+
+        throw new RuntimeException(
+                "No se pudo descontar el stock en Logística"
+        );
+      }
+
+      // -----------------------------------------------
+      // Guardamos primero la necesidad para obtener ID
+      // -----------------------------------------------
+
+      NecesidadMaterial necesidadGuardada =
+              necesidadesRepository.save(necesidad);
+
+      // -----------------------------------------------
+      // Asignación directa
+      // -----------------------------------------------
+
+      String urlAsignacionDirecta =
+              "https://logistica-jc94.onrender.com/asignacionesDirecta";
+
+      Map<String, String> datosAsignacion =
+              new HashMap<>();
+
+      datosAsignacion.put(
+              "paqueteID",
+              paqueteID
+      );
+
+      datosAsignacion.put(
+              "necesidadID",
+              necesidadGuardada.getId()
+      );
+
+      try {
+
+        restTemplate.postForObject(
+                urlAsignacionDirecta,
+                datosAsignacion,
+                String.class
+        );
+
+      } catch (Exception e) {
+
+        throw new RuntimeException(
+                "No se pudo realizar la asignación directa en Logística"
+        );
+      }
+
+      return donadoresYEntidadesDataMapper
+              .toNecesidadDTO(necesidadGuardada);
+    }
+
+    // =====================================================
+    // 6. SI NO HAY STOCK, SOLO GUARDAMOS LA NECESIDAD
     // =====================================================
 
     NecesidadMaterial necesidadGuardada =
