@@ -37,12 +37,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
   private FachadaIncentivos fachadaIncentivos;
   private HistorialEstadoDonadorRepository historialEstadoDonadorRepository;
+  private RestTemplate restTemplate;
 
   public Fachada(DonadoresRepository donadoresRepository,
                  EntidadesRepository entidadesRepository,
                  NecesidadesRepository necesidadesRepository,
                  QuejasRepository quejasRepository,
-                 HistorialEstadoDonadorRepository historialEstadoDonadorRepository) {
+                 HistorialEstadoDonadorRepository historialEstadoDonadorRepository,
+                 RestTemplate restTemplate) {
     /*
     Para que se ejecuten correctamente los tests, se necesita tener un constructor vacio
     Es decir, que no reciba parametros.
@@ -55,6 +57,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     this.necesidadesRepository = necesidadesRepository;
     this.quejasRepository = quejasRepository;
     this.historialEstadoDonadorRepository = historialEstadoDonadorRepository;
+    this.restTemplate = restTemplate;
   }
 
 
@@ -89,25 +92,6 @@ public class Fachada implements FachadaDonadoresYEntidades {
     return donadoresYEntidadesDataMapper.toDonadorDTO(donadorFinal);
   }
 
-  /* //IMPLEMENTADO
-  @Override
-  public DonadorDTO modificarEstado(String donadorID, EstadoDonadorEnum estado) {
-
-    Donador donador = donadoresRepository.findById(donadorID).orElse(null);
-
-    if (donador == null) {
-      throw new RuntimeException();
-    }
-    if (estado == null) {
-      throw new RuntimeException();
-    }
-
-    donador.setEstado(estado);
-
-    Donador donadorGuardado = donadoresRepository.save(donador);
-
-    return donadoresYEntidadesDataMapper.toDonadorDTO(donadorGuardado);
-  } */
   @Override
   public DonadorDTO modificarEstado(String donadorID, EstadoDonadorEnum estado) {
 
@@ -260,7 +244,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
             .orElseThrow(() ->
                     new NoSuchElementException("Donador no encontrado"));
 
-    RestTemplate restTemplate = new RestTemplate();
+    //RestTemplate restTemplate = new RestTemplate();
 
     String baseUrl =
             "https://entrega-2-cesartomasg.onrender.com";
@@ -377,36 +361,6 @@ public class Fachada implements FachadaDonadoresYEntidades {
     return donadoresYEntidadesDataMapper.toEntidadDTO(entidad);
   }
 
-  /* //IMPLEMENTADO
-  @Override
-  public NecesidadMaterialDTO registrarNecesidad(NecesidadMaterialDTO necesidadMaterialDTO) {
-
-    if (necesidadMaterialDTO == null) {
-      throw new RuntimeException();
-    }
-
-    if (necesidadMaterialDTO.id() != null &&
-            necesidadesRepository.findById(necesidadMaterialDTO.id()).isPresent()) {
-      throw new RuntimeException();
-    }
-
-    NecesidadMaterial necesidad =
-            donadoresYEntidadesDataMapper.toNecesidad(necesidadMaterialDTO);
-
-    EntidadBenefica entidad = entidadesRepository
-            .findById(necesidadMaterialDTO.entidadID())
-            .orElseThrow();
-
-    necesidad.setEntidad(entidad);
-
-    entidad.agregarNecesidad(necesidad);
-
-    NecesidadMaterial necesidadGuardada =
-            necesidadesRepository.save(necesidad);
-
-    return donadoresYEntidadesDataMapper.toNecesidadDTO(necesidadGuardada);
-  } */
-
 
   @Override
   public NecesidadMaterialDTO registrarNecesidad(
@@ -428,7 +382,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
       throw new RuntimeException("Producto o cantidad inválida");
     }
 
-    RestTemplate restTemplate = new RestTemplate();
+    //RestTemplate restTemplate = new RestTemplate();
 
     // =====================================================
     // 1. VALIDAR QUE EL PRODUCTO EXISTA EN DONACIONES

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+    <appender name="CONSOLE"
+              class="ch.qos.logback.core.ConsoleAppender">
+
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level
+                [${APP_NAME:-donadores-y-entidades}]
+                [trace=%X{traceId} req=%X{requestId}]
+                [%thread] %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+
+    </appender>
+
+    <if condition='isDefined("BETTERSTACK_SOURCE_TOKEN")'>
+        <then>
+
+            <appender name="BETTERSTACK"
+                      class="com.logtail.logback.LogtailAppender">
+
+                <appName>${APP_NAME:-donadores-y-entidades}</appName>
+
+                <sourceToken>${BETTERSTACK_SOURCE_TOKEN}</sourceToken>
+
+                <ingestUrl>
+                    ${BETTERSTACK_INGEST_URL:-https://in.logs.betterstack.com}
+                </ingestUrl>
+
+                <mdcFields>traceId,instanceId,requestId</mdcFields>
+
+                <mdcTypes>string,string,string</mdcTypes>
+
+            </appender>
+
+            <root level="INFO">
+                <appender-ref ref="CONSOLE"/>
+                <appender-ref ref="BETTERSTACK"/>
+            </root>
+
+        </then>
+
+        <else>
+
+            <root level="INFO">
+                <appender-ref ref="CONSOLE"/>
+            </root>
+
+        </else>
+
+    </if>
+
+</configuration>
