@@ -66,7 +66,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
   public DonadorDTO agregarDonador(DonadorDTO donadorDTO) {
 
     if (donadorDTO == null) {
-      throw new RuntimeException();
+      throw new IllegalArgumentException("El donador no puede ser null");
     }
 /*
     if (donadorDTO.id() != null && this.donadoresRepository.findById(donadorDTO.id()).isPresent()) {
@@ -85,7 +85,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     val donadorOptional = this.donadoresRepository.findById(donadorID);
 
     if (donadorOptional.isEmpty()) {
-      throw new RuntimeException();
+      throw new NoSuchElementException("Donador no encontrado");
     }
     val donadorFinal = donadorOptional.get();
 
@@ -98,11 +98,11 @@ public class Fachada implements FachadaDonadoresYEntidades {
     Donador donador = donadoresRepository.findById(donadorID).orElse(null);
 
     if (donador == null) {
-      throw new RuntimeException();
+      throw new NoSuchElementException("Donador no encontrado");
     }
 
     if (estado == null) {
-      throw new RuntimeException();
+      throw new IllegalArgumentException("El estado no puede ser null");
     }
 
     EstadoDonadorEnum estadoAnterior = donador.getEstado();
@@ -127,7 +127,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     Donador donador = donadoresRepository.findById(donadorID).orElse(null);
 
     if (donador == null) {
-      throw new RuntimeException();
+      throw new NoSuchElementException("Donador no encontrado");
     }
 
     List<HistorialEstadoDonador> historial =
@@ -148,10 +148,10 @@ public class Fachada implements FachadaDonadoresYEntidades {
     Donador donador = donadoresRepository.findById(donadorID).orElse(null);
 
     if (donador == null) {
-      throw new RuntimeException();
+      throw new NoSuchElementException("Donador no encontrado");
     }
     if (categoria == null) {
-      throw new RuntimeException();
+      throw new IllegalArgumentException("La categoría no puede ser null");
     }
 
     donador.setCategoria(categoria);
@@ -174,7 +174,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     Donador donador = donadoresRepository.findById(donadorID).orElse(null);
 
     if (donador == null) {
-      throw new RuntimeException(/*"Donador no encontrado"*/);
+      throw new NoSuchElementException("Donador no encontrado");
     }
 
     switch (donador.getEstado()) {
@@ -211,22 +211,22 @@ public class Fachada implements FachadaDonadoresYEntidades {
   public NecesidadMaterialDTO satisfacerNecesidad(String necesidadID, Integer cantidad) {
 
     if (cantidad == null || cantidad <= 0) {
-      throw new RuntimeException(/*"Cantidad inválida"*/);
+      throw new IllegalArgumentException("Cantidad inválida");
     }
     NecesidadMaterial necesidad = necesidadesRepository
             .findById(necesidadID)
             .orElse(null);
     if (necesidad == null) {
-      throw new RuntimeException(/*"Necesidad no encontrada"*/);
+      throw new NoSuchElementException("Necesidad no encontrada");
     }
     int nuevaCantidad = necesidad.getCantidadActual() + cantidad;
     //Nuevo requerimiento TP2
     if (necesidad.getTipo() == RECURRENTE &&
             cantidad < necesidad.getCantidadObjetivo()) {
-      throw new RuntimeException();
+      throw new IllegalArgumentException("La cantidad no cumple con la cantidad objetivo para una necesidad recurrente");
     }
     if (necesidad.getCantidadActual() >= necesidad.getCantidadObjetivo()) {
-      throw new RuntimeException("Necesidad ya satisfecha");
+      throw new IllegalArgumentException("Necesidad ya satisfecha");
     }
     necesidad.setCantidadActual(nuevaCantidad);
 
@@ -331,12 +331,12 @@ public class Fachada implements FachadaDonadoresYEntidades {
   public EntidadBeneficaDTO agregarEntidad(EntidadBeneficaDTO entidadBeneficaDTO) {
 
     if (entidadBeneficaDTO == null) {
-      throw new RuntimeException();
+      throw new IllegalArgumentException("La entidad no puede ser null");
     }
 
     if (entidadBeneficaDTO.id() != null &&
             entidadesRepository.findById(entidadBeneficaDTO.id()).isPresent()) {
-      throw new RuntimeException();
+      throw new IllegalArgumentException("La entidad ya existe");
     }
 
     EntidadBenefica entidad =
@@ -367,19 +367,19 @@ public class Fachada implements FachadaDonadoresYEntidades {
           NecesidadMaterialDTO necesidadMaterialDTO) {
 
     if (necesidadMaterialDTO == null) {
-      throw new RuntimeException();
+      throw new IllegalArgumentException("La necesidad no puede ser null");
     }
 
     if (necesidadMaterialDTO.id() != null &&
             necesidadesRepository.findById(necesidadMaterialDTO.id()).isPresent()) {
-      throw new RuntimeException();
+      throw new IllegalArgumentException("La necesidad ya existe");
     }
 
     String productoID = necesidadMaterialDTO.productoSolicitadoID();
     Integer cantidadObjetivo = necesidadMaterialDTO.cantidadObjetivo();
 
     if (productoID == null || cantidadObjetivo == null || cantidadObjetivo <= 0) {
-      throw new RuntimeException("Producto o cantidad inválida");
+      throw new IllegalArgumentException("Producto o cantidad inválida");
     }
 
     //RestTemplate restTemplate = new RestTemplate();
@@ -418,7 +418,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     EntidadBenefica entidad = entidadesRepository
             .findById(necesidadMaterialDTO.entidadID())
-            .orElseThrow();
+            .orElseThrow(() -> new NoSuchElementException("Entidad no encontrada"));
 
     necesidad.setEntidad(entidad);
     entidad.agregarNecesidad(necesidad);
@@ -560,19 +560,19 @@ public class Fachada implements FachadaDonadoresYEntidades {
                                QuejaDTO quejaDTO) {
 
     if (quejaDTO == null) {
-      throw new RuntimeException();
+      throw new IllegalArgumentException("La queja no puede ser null");
     }
     Donador donador = donadoresRepository
             .findById(donadorID)
             .orElse(null);
     //VALIDAR DUPLICADO SOLO POR ID DEL DTO
     if (quejaDTO.id() != null) {
-      throw new RuntimeException();
+      throw new IllegalArgumentException("La queja no puede tener un ID");
     }
     Queja queja = donadoresYEntidadesDataMapper.toQueja(quejaDTO);
 
     if (donador == null) {
-      throw new RuntimeException();
+      throw new NoSuchElementException("Donador no encontrado");
     }
     queja.setDonador(donador);
 
