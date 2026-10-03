@@ -72,7 +72,7 @@ public class NecesidadController {
         return ResponseEntity.ok(
                 fachada.obtenerNecesidadesInsatisfechas(productoId)
         );
-    }
+    } ///aaasdasd
 
     @PostMapping("/{necesidadID}/satisfaccion")
     public ResponseEntity<NecesidadMaterialDTO> satisfacerNecesidad(
