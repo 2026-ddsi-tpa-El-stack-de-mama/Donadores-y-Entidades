@@ -67,7 +67,7 @@ public class NecesidadController {
 
     @GetMapping("/insatisfechas")
     public ResponseEntity<List<NecesidadMaterialDTO>> obtenerNecesidadesInsatisfechas(
-            @RequestBody String productoId
+            @RequestParam String productoId
     ) {
         return ResponseEntity.ok(
                 fachada.obtenerNecesidadesInsatisfechas(productoId)
