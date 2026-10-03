@@ -19,6 +19,7 @@ public class DonadorController {
   private final Counter consultasDonadores;
   private final Counter donadoresCreados;
   private final Counter categoriasModificadas;
+  private final Counter quejasRegistradas;
 
   public DonadorController(Fachada fachada, MeterRegistry meterRegistry) {
     this.fachada = fachada;
@@ -28,6 +29,8 @@ public class DonadorController {
             meterRegistry.counter("donadores.creados");
     this.categoriasModificadas =
             meterRegistry.counter("donadores.categoria_modificada");
+    this.quejasRegistradas =
+            meterRegistry.counter("donadores.quejas_registradas");
   }
 
   @PostMapping
@@ -122,7 +125,11 @@ public class DonadorController {
           @PathVariable String id,
           @RequestBody QuejaDTO quejaDTO) {
 
-    return fachada.agregarQueja(id, quejaDTO);
+    QuejaDTO queja = fachada.agregarQueja(id, quejaDTO);
+
+    quejasRegistradas.increment();
+
+    return queja;
   }
 
   @GetMapping("/{id}/quejas")
