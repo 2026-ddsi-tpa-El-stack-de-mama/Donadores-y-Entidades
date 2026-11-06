@@ -1,9 +1,14 @@
 package ar.edu.utn.dds.k3003.eventos;
 
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.DonadorDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EntidadBeneficaDTO;
+import ar.edu.utn.dds.k3003.catedra.fachadas.FachadaDonadoresYEntidades;
 import ar.edu.utn.dds.k3003.model.Donador;
 import ar.edu.utn.dds.k3003.model.EntidadBenefica;
 import ar.edu.utn.dds.k3003.model.NecesidadMaterial;
 import ar.edu.utn.dds.k3003.model.Queja;
+import ar.edu.utn.dds.k3003.repositories.DonadoresRepository;
+import ar.edu.utn.dds.k3003.repositories.DonadoresYEntidadesDataMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -11,6 +16,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -19,6 +25,11 @@ import java.util.UUID;
 public class EventoPublisher {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final DonadoresYEntidadesDataMapper donadoresYEntidadesDataMapper;
+
+    public EventoPublisher() {
+        donadoresYEntidadesDataMapper = new DonadoresYEntidadesDataMapper();
+    }
 
     public void publicar(String tipoEvento, Object descripcion) {
 
@@ -77,59 +88,34 @@ public class EventoPublisher {
         DonadorEvento evento = new DonadorEvento(
                 donador.getId(),
                 donador.getNombre(),
-                donador.getApellido(),
-                donador.getEdad(),
-                donador.getEmail(),
-                donador.getNroDocumento(),
-                donador.getDomicilio(),
-                donador.getEstado().name(),
-                donador.getCategoria()
+                donador.getEstado(),
+                donador.getCategoria(),
+                Collections.singletonList(donadoresYEntidadesDataMapper.toQuejaDTO((Queja) donador.getQuejas()))
         );
 
         publicar("DonadorEvento", evento);
     }
+
     public void publicarEntidad(EntidadBenefica entidad) {
 
-        EntidadEvento evento = new EntidadEvento(
-                entidad.getId(),
-                entidad.getRazonSocial(),
-                entidad.getDomicilio(),
-                entidad.getTelefono(),
-                entidad.getCorreo()
-        );
+        EntidadBeneficaDTO evento = donadoresYEntidadesDataMapper.toEntidadDTO(entidad);
 
         publicar("EntidadEvento", evento);
     }
     public void publicarNecesidad(NecesidadMaterial necesidad) {
-
         NecesidadEvento evento = new NecesidadEvento(
                 necesidad.getId(),
-                necesidad.getEntidad() != null
-                        ? necesidad.getEntidad().getId()
-                        : null,
                 necesidad.getNivelDeUrgencia(),
-                necesidad.getDescripcion(),
-                necesidad.getCantidadObjetivo(),
-                necesidad.getCantidadActual(),
-                necesidad.getProductoSolicitadoID(),
-                necesidad.getTipo() != null
-                        ? necesidad.getTipo().name()
-                        : null
-        );
+                necesidad.getTipo(),
+                donadoresYEntidadesDataMapper.toEntidadDTO(necesidad.getEntidad()),
+                (necesidad.getCantidadObjetivo()) - necesidad.getCantidadActual());
 
         publicar("NecesidadEvento", evento);
     }
+
     public void publicarQueja(Queja queja) {
 
-        QuejaEvento evento = new QuejaEvento(
-                queja.getId(),
-                queja.getDonacionID(),
-                queja.getDonador() != null
-                        ? queja.getDonador().getId()
-                        : null,
-                queja.getFecha(),
-                queja.getDescripcion()
-        );
+        DonadorDTO evento = donadoresYEntidadesDataMapper.toDonadorDTO(queja.getDonador());
 
         publicar("QuejaEvento", evento);
     }

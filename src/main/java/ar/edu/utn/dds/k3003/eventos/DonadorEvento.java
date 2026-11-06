@@ -1,14 +1,16 @@
 package ar.edu.utn.dds.k3003.eventos;
 
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EntidadBeneficaDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EstadoDonadorEnum;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.QuejaDTO;
+
+import java.util.List;
+
 public record DonadorEvento(
         String id,
         String nombre,
-        String apellido,
-        Integer edad,
-        String email,
-        String nroDocumento,
-        String domicilio,
-        String estado,
-        String categoria
+        EstadoDonadorEnum estado,
+        String categoria,
+        List<QuejaDTO> quejasRecibidas
 ) {
 }
