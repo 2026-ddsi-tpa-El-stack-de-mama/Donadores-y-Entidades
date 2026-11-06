@@ -23,6 +23,8 @@ import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.InsigniasResponseDT
 import ar.edu.utn.dds.k3003.model.HistorialEstadoDonador;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.HistorialEstadoDonadorDTO;
 import org.springframework.web.server.ResponseStatusException;
+import ar.edu.utn.dds.k3003.eventos.DonadorEvento;
+import ar.edu.utn.dds.k3003.eventos.EventoPublisher;
 
 @Service
 public class Fachada implements FachadaDonadoresYEntidades {
@@ -38,13 +40,15 @@ public class Fachada implements FachadaDonadoresYEntidades {
   private FachadaIncentivos fachadaIncentivos;
   private HistorialEstadoDonadorRepository historialEstadoDonadorRepository;
   private RestTemplate restTemplate;
+  private EventoPublisher eventoPublisher;
 
   public Fachada(DonadoresRepository donadoresRepository,
                  EntidadesRepository entidadesRepository,
                  NecesidadesRepository necesidadesRepository,
                  QuejasRepository quejasRepository,
                  HistorialEstadoDonadorRepository historialEstadoDonadorRepository,
-                 RestTemplate restTemplate) {
+                 RestTemplate restTemplate,
+                 EventoPublisher eventoPublisher) {
     /*
     Para que se ejecuten correctamente los tests, se necesita tener un constructor vacio
     Es decir, que no reciba parametros.
@@ -58,6 +62,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     this.quejasRepository = quejasRepository;
     this.historialEstadoDonadorRepository = historialEstadoDonadorRepository;
     this.restTemplate = restTemplate;
+    this.eventoPublisher = eventoPublisher;
   }
 
 
@@ -68,14 +73,12 @@ public class Fachada implements FachadaDonadoresYEntidades {
     if (donadorDTO == null) {
       throw new IllegalArgumentException("El donador no puede ser null");
     }
-/*
-    if (donadorDTO.id() != null && this.donadoresRepository.findById(donadorDTO.id()).isPresent()) {
-      throw new RuntimeException();
-    } */
 
     Donador donador = donadoresYEntidadesDataMapper.toDonador(donadorDTO);
 
     Donador donadorGuardado = this.donadoresRepository.save(donador);
+
+    //eventoPublisher.publicarDonador(donadorGuardado);
 
     return donadoresYEntidadesDataMapper.toDonadorDTO(donadorGuardado);
   }
