@@ -9,22 +9,27 @@ import ar.edu.utn.dds.k3003.model.NecesidadMaterial;
 import ar.edu.utn.dds.k3003.model.Queja;
 import ar.edu.utn.dds.k3003.repositories.DonadoresRepository;
 import ar.edu.utn.dds.k3003.repositories.DonadoresYEntidadesDataMapper;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.QuejaDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @Component
 public class EventoPublisher {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    // Las quejas traen LocalDate: viaja como texto, por ejemplo "2026-11-07".
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .findAndRegisterModules()
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     private final DonadoresYEntidadesDataMapper donadoresYEntidadesDataMapper;
 
     public EventoPublisher() {
@@ -90,7 +95,7 @@ public class EventoPublisher {
                 donador.getNombre(),
                 donador.getEstado(),
                 donador.getCategoria(),
-                Collections.singletonList(donadoresYEntidadesDataMapper.toQuejaDTO((Queja) donador.getQuejas()))
+                quejasDe(donador)
         );
 
         publicar("DonadorEvento", evento);
@@ -103,10 +108,16 @@ public class EventoPublisher {
                 donador.getNombre(),
                 donador.getEstado(),
                 donador.getCategoria(),
-                Collections.singletonList(donadoresYEntidadesDataMapper.toQuejaDTO((Queja) donador.getQuejas()))
+                quejasDe(donador)
         );
 
         publicar("ModificarDonadorEvento", evento);
+    }
+
+    private List<QuejaDTO> quejasDe(Donador donador) {
+        return donador.getQuejas().stream()
+                .map(donadoresYEntidadesDataMapper::toQuejaDTO)
+                .toList();
     }
 
     public void publicarEntidad(EntidadBenefica entidad) {

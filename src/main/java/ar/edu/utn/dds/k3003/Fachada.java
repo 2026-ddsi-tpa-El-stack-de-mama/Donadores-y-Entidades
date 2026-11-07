@@ -628,6 +628,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
             .map(donadoresYEntidadesDataMapper::toDonadorDTO)
             .toList();
   }
+
+  // Lo pide Incentivos al asignar una mision: los donadores viejos no tienen ficha en Consultas.
+  public void publicarDonador(String donadorID) {
+    Donador donador = donadoresRepository.findById(donadorID)
+            .orElseThrow(() -> new NoSuchElementException("Donador no encontrado"));
+    eventoPublisher.publicarDonador(donador);
+  }
+
   public List<EntidadBeneficaDTO> buscarEntidades() {
 
     return entidadesRepository.findAll()

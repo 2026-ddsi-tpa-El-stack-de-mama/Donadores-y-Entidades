@@ -148,6 +148,15 @@ public class DonadorController {
 
     return fachada.obtenerHistorialEstado(id);
   }
+
+  @PostMapping("/{id}/publicar")
+  public ResponseEntity<Void> publicarDonador(
+          @PathVariable String id) {
+
+    fachada.publicarDonador(id);
+
+    return ResponseEntity.ok().build();
+  }
 }
 /*
 @RestController
