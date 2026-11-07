@@ -96,6 +96,19 @@ public class EventoPublisher {
         publicar("DonadorEvento", evento);
     }
 
+    public void publicarDonadorModificado(Donador donador) {
+
+        DonadorEvento evento = new DonadorEvento(
+                donador.getId(),
+                donador.getNombre(),
+                donador.getEstado(),
+                donador.getCategoria(),
+                Collections.singletonList(donadoresYEntidadesDataMapper.toQuejaDTO((Queja) donador.getQuejas()))
+        );
+
+        publicar("ModificarDonadorEvento", evento);
+    }
+
     public void publicarEntidad(EntidadBenefica entidad) {
 
         EntidadBeneficaDTO evento = donadoresYEntidadesDataMapper.toEntidadDTO(entidad);
@@ -111,6 +124,17 @@ public class EventoPublisher {
                 (necesidad.getCantidadObjetivo()) - necesidad.getCantidadActual());
 
         publicar("NecesidadEvento", evento);
+    }
+
+    public void publicarNecesidadModificada(NecesidadMaterial necesidad) {
+        NecesidadEvento evento = new NecesidadEvento(
+                necesidad.getId(),
+                necesidad.getNivelDeUrgencia(),
+                necesidad.getTipo(),
+                donadoresYEntidadesDataMapper.toEntidadDTO(necesidad.getEntidad()),
+                (necesidad.getCantidadObjetivo()) - necesidad.getCantidadActual());
+
+        publicar("ModificarNecesidadEvento", evento);
     }
 
     public void publicarQueja(Queja queja) {

@@ -120,7 +120,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     );
 
     historialEstadoDonadorRepository.save(historial);
-    eventoPublisher.publicarDonador(donadorGuardado);
+    eventoPublisher.publicarDonadorModificado(donadorGuardado);
 
     return donadoresYEntidadesDataMapper.toDonadorDTO(donadorGuardado);
   }
@@ -160,7 +160,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     donador.setCategoria(categoria);
 
     Donador donadorGuardado = donadoresRepository.save(donador);
-    eventoPublisher.publicarDonador(donadorGuardado);
+    eventoPublisher.publicarDonadorModificado(donadorGuardado);
     return donadoresYEntidadesDataMapper.toDonadorDTO(donadorGuardado);
   }
 
@@ -234,7 +234,6 @@ public class Fachada implements FachadaDonadoresYEntidades {
     necesidad.setCantidadActual(nuevaCantidad);
 
     necesidadesRepository.save(necesidad);
-    eventoPublisher.publicarNecesidad(necesidad);
     return donadoresYEntidadesDataMapper.toNecesidadDTO(necesidad);
   }
 
@@ -592,6 +591,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     donadoresRepository.save(donador);
 
     Queja quejaGuardada = quejasRepository.save(queja);
+    eventoPublisher.publicarDonadorModificado(donador);
     eventoPublisher.publicarQueja(queja);
 
     return donadoresYEntidadesDataMapper.toQuejaDTO(quejaGuardada);
@@ -665,8 +665,6 @@ public class Fachada implements FachadaDonadoresYEntidades {
     EntidadBenefica entidadActualizada =
             entidadesRepository.save(entidad);
 
-    eventoPublisher.publicarEntidad(entidadActualizada);
-
     return donadoresYEntidadesDataMapper
             .toEntidadDTO(entidadActualizada);
   }
@@ -719,8 +717,6 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     NecesidadMaterial necesidadActualizada =
             necesidadesRepository.save(necesidad);
-
-    eventoPublisher.publicarNecesidad(necesidadActualizada);
 
     return donadoresYEntidadesDataMapper
             .toNecesidadDTO(necesidadActualizada);
